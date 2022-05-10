@@ -4,6 +4,7 @@ from data.users import User
 from data.jobs import Jobs
 from data.forms import RegisterForm, LoginForm, WorksForm
 from flask_login import LoginManager, login_user, logout_user, login_required
+import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -20,7 +21,7 @@ def load_user(id):
 def index():
     session = db_session.create_session()
     jobs = session.query(Jobs).all()
-    return render_template("Journal_works.html", jobs=jobs)
+    return render_template("journal_works.html", jobs=jobs)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -72,8 +73,7 @@ def add_work():
             team_leader=form.team_leader.data,
             job=form.job.data,
             work_size=form.work_size.data,
-            collaborators=form.collaborators.data,
-            is_finished=form.is_finished.data
+            collaborators=form.collaborators.data
         )
         db_sess.add(job)
         db_sess.commit()
@@ -91,7 +91,8 @@ def logout():
 def main():
     name_db = 'mars_explorer.db'
     db_session.global_init(f"db/{name_db}")
-    app.run(port=5003)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
 
 
 if __name__ == '__main__':
